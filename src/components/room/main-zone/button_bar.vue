@@ -10,20 +10,11 @@
           <icon-camera-change style="width: 100%; height: 100%; color: black" />
         </div>
       </button>
-      <span class="hidden text-sm font-medium mx-auto md:block">Switch</span>
+      <span class="hidden text-sm font-medium mx-auto md:block">Device</span>
     </div>
     <div class="flex flex-col align-center justify-center space-y-1">
       <button
-        class="p-0 mx-auto w-12 h-12 md:w-14 md:h-14 bg-white rounded-full hover:bg-gray-100 mouse shadow-2xl transition ease-in duration-200 focus:outline-none"
-      >
-        <div class="w-6 m-auto">
-          <icon-webcam style="width: 100%; height: 100%; color: black" />
-        </div>
-      </button>
-      <span class="hidden text-sm font-medium mx-auto md:block">Cam</span>
-    </div>
-    <div class="flex flex-col align-center justify-center space-y-1">
-      <button
+        v-on:click="toggleAudio"
         class="p-0 mx-auto w-12 h-12 md:w-14 md:h-14 bg-white rounded-full hover:bg-gray-100 mouse shadow-2xl transition ease-in duration-200 focus:outline-none"
       >
         <div class="w-6 m-auto">
@@ -34,7 +25,18 @@
     </div>
     <div class="flex flex-col align-center justify-center space-y-1">
       <button
-        v-on:click="leaveCall"
+        v-on:click="toggleVideo"
+        class="p-0 mx-auto w-12 h-12 md:w-14 md:h-14 bg-white rounded-full hover:bg-gray-100 mouse shadow-2xl transition ease-in duration-200 focus:outline-none"
+      >
+        <div class="w-6 m-auto">
+          <icon-webcam style="width: 100%; height: 100%; color: black" />
+        </div>
+      </button>
+      <span class="hidden text-sm font-medium mx-auto md:block">Cam</span>
+    </div>
+    <div class="flex flex-col align-center justify-center space-y-1">
+      <button
+        v-on:click="endCall"
         class="p-0 mx-auto w-12 h-12 md:w-14 md:h-14 bg-red-600 rounded-full hover:bg-red-700 mouse shadow-2xl transition ease-in duration-200 focus:outline-none"
       >
         <div class="w-6 m-auto">
@@ -61,11 +63,27 @@ export default {
     IconMicrophone,
     IconCallEnd,
   },
-  props: { client },
+  props: {
+    client: { type: Object, required: true },
+    localAudio: { type: Object },
+    localVideo: { type: Object },
+  },
   setup(props) {
     // States
-    var isAudioEnabled = ref();
-    var isVideoEnabled = ref();
+    var isAudioEnabled = ref(true);
+    var isVideoEnabled = ref(true);
+
+    // Toggle audio
+    function toggleAudio() {
+      isAudioEnabled = !isAudioEnabled;
+      props.localAudio.setEnabled(isAudioEnabled);
+    }
+
+    // Toggle video
+    function toggleVideo() {
+      isVideoEnabled = !isVideoEnabled;
+      props.localVideo.setEnabled(isVideoEnabled);
+    }
 
     // End call
     async function endCall() {
@@ -78,7 +96,13 @@ export default {
     }
 
     // Return
-    return { isAudioEnabled, isVideoEnabled, endCall }
+    return {
+      isAudioEnabled,
+      isVideoEnabled,
+      toggleAudio,
+      toggleVideo,
+      endCall,
+    };
   },
 };
 </script>

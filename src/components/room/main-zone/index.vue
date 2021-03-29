@@ -28,7 +28,12 @@
       </div>
     </div>
 
-    <button-bar />
+    <button-bar
+      v-if="client != null"
+      :client="client"
+      :local-audio="localAudioTrack"
+      :local-video="localVideoTrack"
+    />
   </div>
 </template>
 
@@ -37,9 +42,10 @@ import { ref } from "vue";
 import AgoraRTC from "agora-rtc-sdk-ng";
 import AppConfigs from "@/configs/app.configs.json";
 import IconSetting from "virtual:vite-icons/uil/setting";
+import ButtonBar from "./button_bar.vue";
 
 export default {
-  components: { IconSetting },
+  components: { IconSetting, ButtonBar },
   setup() {
     var client = ref();
     var localAudioTrack = ref();
@@ -55,10 +61,10 @@ export default {
 
     async function startVideoCall() {
       // Create client
-      client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+      client.value = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
 
       // Join channel
-      const uid = await client.join(
+      const uid = await client.value.join(
         AppConfigs.agoraAppId,
         "demo_channel_name",
         null,
@@ -66,18 +72,17 @@ export default {
       );
 
       // Create and publish local track
-      localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
-      localVideoTrack = await AgoraRTC.createCameraVideoTrack();
-      await client.publish([localAudioTrack, localVideoTrack]);
+      localAudioTrack.value = await AgoraRTC.createMicrophoneAudioTrack();
+      localVideoTrack.value = await AgoraRTC.createCameraVideoTrack();
+      await client.value.publish([localAudioTrack.value, localVideoTrack.value]);
       var localPlayer = document.createElement("div");
       localPlayer.id = uid;
-
-      updateMainView(localPlayer, localVideoTrack);
+      updateMainView(localPlayer, localVideoTrack.value);
 
       // Subscribe to a remote user
-      client.on("user-published", async (user, mediaType) => {
+      client.value.on("user-published", async (user, mediaType) => {
         // Subscribe to a remote user.
-        await client.subscribe(user, mediaType);
+        await client.value.subscribe(user, mediaType);
         console.log("subscribe success: ${mediaType}");
 
         // If the subscribed track is video.
@@ -101,7 +106,7 @@ export default {
         }
       });
 
-      client.on("user-unpublished", (user) => {
+      client.value.on("user-unpublished", (user) => {
         // Get the dynamically created DIV container.
         const playerContainer = document.getElementById(user.uid);
         // Destroy the container.
@@ -111,7 +116,7 @@ export default {
 
     startVideoCall();
 
-    return {  };
+    return { client, localAudioTrack, localVideoTrack };
   },
 };
 </script>
