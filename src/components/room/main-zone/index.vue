@@ -12,7 +12,10 @@
       </button>
     </div>
 
-    <stream-view :local-video="localVideoTrack" :client="client" />
+    <stream-view
+      :client="client"
+      :local-video="localVideoTrack"
+    />
 
     <button-bar
       v-if="client != null"
@@ -24,7 +27,7 @@
 </template>
 
 <script>
-import { onMounted, ref } from "vue";
+import { computed, ref } from "vue";
 import AgoraRTC from "agora-rtc-sdk-ng";
 import { Notyf } from "notyf";
 import "notyf/notyf.min.css";
@@ -45,46 +48,52 @@ export default {
         y: "top",
       },
     });
-    var client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+    AgoraRTC.setLogLevel(2);
+    const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
     var localAudioTrack = ref();
     var localVideoTrack = ref();
 
-    async function startVideoCall() {
-      // Join channel
-      await client.join(AppConfigs.agoraAppId, "demo_channel_name", null);
-      notyf.success("Join channel successfully!");
-
-      // Create and publish local track
-      localAudioTrack.value = await AgoraRTC.createMicrophoneAudioTrack();
-      localVideoTrack.value = await AgoraRTC.createCameraVideoTrack();
-      await client.publish([localAudioTrack.value, localVideoTrack.value]);
-
+    async function eventHandler() {
       // Subscribe to a remote user
       client.on("user-published", async (user, mediaType) => {
         // Subscribe to a remote user
         await client.subscribe(user, mediaType);
-        console.log("subscribe success", user, mediaType);
-        notyf.success(`User ${user.uid} joined`);
 
-        // If the subscribed track is video.
-        if (mediaType === "video") {
-        }
-
-        // If the subscribed track is audio.
         if (mediaType === "audio") {
-          // Get `RemoteAudioTrack` in the `user` object.
           const remoteAudioTrack = user.audioTrack;
-          // Play the audio track. No need to pass any DOM element.
           remoteAudioTrack.play();
         }
       });
 
       client.on("user-unpublished", (user) => {
-        notyf.error(`User ${user.uid} leaved`);
+        console.log("user-unpublished" + user.uid);
+      });
+      client.on("connection-state-change", (curState, revState, reason) => {
+        console.log("connection-state-change", curState);
+      });
+      client.on("user-joined", (user) => {
+        console.log("user-joined: " + user.uid);
+        notyf.success(`User ${user.uid} joined`);
+      });
+      client.on("user-left", (user) => {
+        console.log("user-left: " + user.uid);
+        notyf.success(`User ${user.uid} leaved`);
       });
     }
 
-    onMounted(async () => await startVideoCall());
+    async function startVideoCall() {
+      // Join channel
+      await client.join(AppConfigs.agoraAppId, "demo_channel_name", null);
+
+      // Create and publish local track
+      localAudioTrack.value = await AgoraRTC.createMicrophoneAudioTrack();
+      localVideoTrack.value = await AgoraRTC.createCameraVideoTrack();
+      await client.publish([localAudioTrack.value, localVideoTrack.value]);
+    }
+
+    // Call function
+    eventHandler();
+    startVideoCall();
 
     return { client, localAudioTrack, localVideoTrack };
   },

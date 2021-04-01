@@ -31,17 +31,36 @@
     <div
       class="flex space-x-1 justify-center align-center absolute top-4 left-4 py-1 px-2 shadow-lg rounded-md bg-white"
     >
-      <div class="w-3 h-3 md:w-4 md:h-4 m-auto bg-green-500 rounded-full"></div>
+      <div class="flex items-center w-3 h-3 md:w-4 md:h-4 m-auto rounded-full">
+        <img
+        class="w-3/4 h-3/4"
+          :src="
+            networkQuality == 0
+              ? '/image/loading.gif'
+              : `/image/network-${networkQuality}.png`
+          "
+          alt=""
+        />
+      </div>
       <p class="font-medium text-gray-400 antialiased text-xs">08:10</p>
     </div>
 
     <div
       class="flex flex-wrap flex-wrap-reverse h-full flex-col absolute top-0 right-2 py-4"
     >
-      <div class="w-16 h-16 mb-1 ml-1 bg-black rounded-full border-2 border-white overflow-hidden">
-        <stream-single v-if="localVideo != null" :user="{ uid: client.uid, videoTrack: localVideo }" />
+      <div
+        class="w-16 h-16 mb-1 ml-1 bg-black rounded-full border-2 border-white overflow-hidden"
+      >
+        <stream-single
+          v-if="localVideo != null"
+          :user="{ uid: client.uid, videoTrack: localVideo }"
+        />
       </div>
-      <div v-for="(user, index) in otherUsers" :key="'video-track-' + user.uid" class="w-16 h-16 mb-1 ml-1 bg-black rounded-full border-2 border-white overflow-hidden">
+      <div
+        v-for="(user, index) in otherUsers"
+        :key="'video-track-' + user.uid"
+        class="w-16 h-16 mb-1 ml-1 bg-black rounded-full border-2 border-white overflow-hidden"
+      >
         <stream-single v-on:click="changeMainUser(index)" :user="user" />
       </div>
     </div>
@@ -61,8 +80,15 @@ export default {
     // State
     var mainUser = ref();
     var otherUsers = ref([]);
+    var networkQuality = ref(0);
 
-    console.log(props.client)
+    // Check network quality
+    function checkNetworkQuality() {
+      // Check network quality
+      props.client.on("network-quality", (stats) => {
+        networkQuality.value = stats.downlinkNetworkQuality;
+      });
+    }
 
     // Update user list everytime event push
     function checkUserList() {
@@ -80,7 +106,9 @@ export default {
           ) {
             mainUser.value = remoteUsers[0];
           } else {
-            mainUser.value = remoteUsers.find((e) => e.uid == mainUser.value.uid);
+            mainUser.value = remoteUsers.find(
+              (e) => e.uid == mainUser.value.uid
+            );
           }
 
           otherUsers.value = remoteUsers.filter(
@@ -89,17 +117,19 @@ export default {
         }
       }, 500);
     }
-    checkUserList();
 
     // Change main user with other user
     function changeMainUser(index) {
-      let tUser = mainUser.value
-      mainUser.value = otherUsers.value[index]
-      otherUsers.value[index] = tUser
+      let tUser = mainUser.value;
+      mainUser.value = otherUsers.value[index];
+      otherUsers.value[index] = tUser;
     }
 
+    checkUserList();
+    checkNetworkQuality();
+
     // Return
-    return { mainUser, otherUsers, changeMainUser };
+    return { mainUser, otherUsers, changeMainUser, networkQuality };
   },
 };
 </script>
