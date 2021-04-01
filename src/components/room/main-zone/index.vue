@@ -11,22 +11,8 @@
         </div>
       </button>
     </div>
-    <div
-      class="flex-grow relative rounded-3xl bg-red-100 shadow-sm overflow-hidden"
-    >
-      <div id="main-video" class="object-cover h-full w-full"></div>
 
-      <div
-        class="flex space-x-1 justify-center align-center absolute top-4 left-4 py-1 px-2 shadow-lg rounded-md bg-white"
-      >
-        <div
-          class="w-3 h-3 md:w-4 md:h-4 m-auto bg-green-500 rounded-full"
-        ></div>
-        <p class="font-semibold text-gray-400 antialiased text-xs md:text-base">
-          08:10
-        </p>
-      </div>
-    </div>
+    <stream-view :local-video="localVideoTrack" :client="client" />
 
     <button-bar
       v-if="client != null"
@@ -38,63 +24,50 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import AgoraRTC from "agora-rtc-sdk-ng";
+import { Notyf } from "notyf";
+import "notyf/notyf.min.css";
+
 import AppConfigs from "@/configs/app.configs.json";
 import IconSetting from "virtual:vite-icons/uil/setting";
+import StreamView from "./stream-view.vue";
 import ButtonBar from "./button_bar.vue";
 
 export default {
-  components: { IconSetting, ButtonBar },
+  components: { IconSetting, StreamView, ButtonBar },
   setup() {
-    var client = ref();
+    const notyf = new Notyf({
+      duration: 3000,
+      dismissible: true,
+      position: {
+        x: "right",
+        y: "top",
+      },
+    });
+    var client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
     var localAudioTrack = ref();
     var localVideoTrack = ref();
-    var remoteTracks = ref([]);
-
-    async function updateMainView(mainView, remoteVideoTrack) {
-      mainView.style.width = "100%";
-      mainView.style.height = "100%";
-      document.getElementById("main-video").appendChild(mainView);
-      remoteVideoTrack.play(mainView.id);
-    }
 
     async function startVideoCall() {
-      // Create client
-      client.value = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
-
       // Join channel
-      const uid = await client.value.join(
-        AppConfigs.agoraAppId,
-        "demo_channel_name",
-        null,
-        null
-      );
+      await client.join(AppConfigs.agoraAppId, "demo_channel_name", null);
+      notyf.success("Join channel successfully!");
 
       // Create and publish local track
       localAudioTrack.value = await AgoraRTC.createMicrophoneAudioTrack();
       localVideoTrack.value = await AgoraRTC.createCameraVideoTrack();
-      await client.value.publish([localAudioTrack.value, localVideoTrack.value]);
-      var localPlayer = document.createElement("div");
-      localPlayer.id = uid;
-      updateMainView(localPlayer, localVideoTrack.value);
+      await client.publish([localAudioTrack.value, localVideoTrack.value]);
 
       // Subscribe to a remote user
-      client.value.on("user-published", async (user, mediaType) => {
-        // Subscribe to a remote user.
-        await client.value.subscribe(user, mediaType);
-        console.log("subscribe success: ${mediaType}");
+      client.on("user-published", async (user, mediaType) => {
+        // Subscribe to a remote user
+        await client.subscribe(user, mediaType);
+        console.log("subscribe success", user, mediaType);
+        notyf.success(`User ${user.uid} joined`);
 
         // If the subscribed track is video.
         if (mediaType === "video") {
-          // Get `RemoteVideoTrack` in the `user` object.
-          const remoteVideoTrack = user.videoTrack;
-          // Dynamically create a container in the form of a DIV element for playing the remote video track.
-          const playerContainer = document.createElement("div");
-          // Specify the ID of the DIV container. You can use the `uid` of the remote user.
-          playerContainer.id = user.uid.toString();
-
-          updateMainView(playerContainer, remoteVideoTrack);
         }
 
         // If the subscribed track is audio.
@@ -106,15 +79,12 @@ export default {
         }
       });
 
-      client.value.on("user-unpublished", (user) => {
-        // Get the dynamically created DIV container.
-        const playerContainer = document.getElementById(user.uid);
-        // Destroy the container.
-        playerContainer.remove();
+      client.on("user-unpublished", (user) => {
+        notyf.error(`User ${user.uid} leaved`);
       });
     }
 
-    startVideoCall();
+    onMounted(async () => await startVideoCall());
 
     return { client, localAudioTrack, localVideoTrack };
   },

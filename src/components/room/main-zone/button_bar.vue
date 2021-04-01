@@ -50,7 +50,7 @@
 
 <script>
 import { ref } from "vue";
-import AgoraRTC from "agora-rtc-sdk-ng";
+// import AgoraRTC from "agora-rtc-sdk-ng";
 import IconCameraChange from "virtual:vite-icons/uil/camera-change";
 import IconWebcam from "virtual:vite-icons/uil/webcam";
 import IconMicrophone from "virtual:vite-icons/uil/microphone";
@@ -88,8 +88,8 @@ export default {
     // End call
     async function endCall() {
       // Destroy the local audio and video tracks.
-      localAudioTrack.close();
-      localVideoTrack.close();
+      props.localAudio.close();
+      props.localVideo.close();
 
       // Leave the channel.
       await props.client.leave();
