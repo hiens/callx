@@ -43,10 +43,10 @@
         <hr class="mb-1" />
         <div class="flex">
           <div class="w-10 h-10 justify-center align-center">
-            <icon-smile class="m-auto h-full text-xl text-gray-500" />
+            <!-- <icon-smile class="m-auto h-full text-xl text-gray-500" /> -->
           </div>
           <div class="w-10 h-10 justify-center align-center">
-            <icon-attach class="m-auto h-full text-xl text-gray-500" />
+            <!-- <icon-attach class="m-auto h-full text-xl text-gray-500" /> -->
           </div>
         </div>
         <textarea
@@ -64,13 +64,5 @@
 </template>
 
 <script>
-import IconSmile from "virtual:vite-icons/uil/smile";
-import IconAttach from "virtual:vite-icons/fluent/attach-12-regular";
-
-export default {
-  components: {
-    IconSmile,
-    IconAttach,
-  },
-};
+export default {};
 </script>

@@ -8,7 +8,7 @@
         id="main-video"
         class="object-cover h-full w-full"
       >
-        <stream-single :key="mainUser.uid" :user="mainUser" />
+        Hello
       </div>
 
       <div v-else class="w-64">
@@ -44,34 +44,13 @@
       </div>
       <p class="font-medium text-gray-400 antialiased text-xs">08:10</p>
     </div>
-
-    <div
-      class="flex flex-wrap flex-wrap-reverse h-full flex-col absolute top-0 right-2 py-4"
-    >
-      <div
-        class="w-16 h-16 mb-1 ml-1 bg-black rounded-full border-2 border-white overflow-hidden"
-      >
-        <stream-single
-          v-if="localVideo != null"
-          :user="{ uid: client.uid, videoTrack: localVideo }"
-        />
-      </div>
-      <div
-        v-for="(user, index) in otherUsers"
-        :key="'video-track-' + user.uid"
-        class="w-16 h-16 mb-1 ml-1 bg-black rounded-full border-2 border-white overflow-hidden"
-      >
-        <stream-single v-on:click="changeMainUser(index)" :user="user" />
-      </div>
-    </div>
   </div>
 </template>
 
 <script>
 import { ref } from "vue";
-import StreamSingle from "./stream-single.vue";
+
 export default {
-  components: { StreamSingle },
   props: {
     client: { type: Object, required: true },
     localVideo: { type: Object, required: false },

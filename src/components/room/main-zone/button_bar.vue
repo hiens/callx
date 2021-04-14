@@ -7,7 +7,7 @@
         class="p-0 mx-auto w-12 h-12 md:w-14 md:h-14 bg-white rounded-full hover:bg-gray-100 mouse shadow-2xl transition ease-in duration-200 focus:outline-none"
       >
         <div class="w-6 m-auto">
-          <icon-camera-change style="width: 100%; height: 100%; color: black" />
+          <!-- <icon-camera-change style="width: 100%; height: 100%; color: black" /> -->
         </div>
       </button>
       <span class="hidden text-sm font-medium mx-auto md:block">Device</span>
@@ -18,7 +18,7 @@
         class="p-0 mx-auto w-12 h-12 md:w-14 md:h-14 bg-white rounded-full hover:bg-gray-100 mouse shadow-2xl transition ease-in duration-200 focus:outline-none"
       >
         <div class="w-6 m-auto">
-          <icon-microphone style="width: 100%; height: 100%; color: black" />
+          <!-- <icon-microphone style="width: 100%; height: 100%; color: black" /> -->
         </div>
       </button>
       <span class="hidden text-sm font-medium mx-auto md:block">Mic</span>
@@ -29,7 +29,7 @@
         class="p-0 mx-auto w-12 h-12 md:w-14 md:h-14 bg-white rounded-full hover:bg-gray-100 mouse shadow-2xl transition ease-in duration-200 focus:outline-none"
       >
         <div class="w-6 m-auto">
-          <icon-webcam style="width: 100%; height: 100%; color: black" />
+          <!-- <icon-webcam style="width: 100%; height: 100%; color: black" /> -->
         </div>
       </button>
       <span class="hidden text-sm font-medium mx-auto md:block">Cam</span>
@@ -40,7 +40,7 @@
         class="p-0 mx-auto w-12 h-12 md:w-14 md:h-14 bg-red-600 rounded-full hover:bg-red-700 mouse shadow-2xl transition ease-in duration-200 focus:outline-none"
       >
         <div class="w-6 m-auto">
-          <icon-call-end style="width: 100%; height: 100%; color: white" />
+          <!-- <icon-call-end style="width: 100%; height: 100%; color: white" /> -->
         </div>
       </button>
       <span class="hidden text-sm font-medium mx-auto md:block">End call</span>
@@ -50,19 +50,9 @@
 
 <script>
 import { ref } from "vue";
-// import AgoraRTC from "agora-rtc-sdk-ng";
-import IconCameraChange from "virtual:vite-icons/uil/camera-change";
-import IconWebcam from "virtual:vite-icons/uil/webcam";
-import IconMicrophone from "virtual:vite-icons/uil/microphone";
-import IconCallEnd from "virtual:vite-icons/ic/outline-call-end";
+import AgoraRTC from "agora-rtc-sdk-ng";
 
 export default {
-  components: {
-    IconCameraChange,
-    IconWebcam,
-    IconMicrophone,
-    IconCallEnd,
-  },
   props: {
     client: { type: Object, required: true },
     localAudio: { type: Object },

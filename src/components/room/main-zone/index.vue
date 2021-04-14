@@ -7,7 +7,7 @@
         class="p-0 mx-auto w-10 h-10 md:w-14 md:h-14 rounded-xl hover:bg-red-700 active:shadow-lg mouse shadow transition ease-in duration-200 focus:outline-none bg-gray-500"
       >
         <div class="w-6 md:w-8 m-auto">
-          <icon-setting style="width: 100%; height: 100%; color: white" />
+          <!-- <icon-setting style="width: 100%; height: 100%; color: white" /> -->
         </div>
       </button>
     </div>
@@ -33,12 +33,11 @@ import { Notyf } from "notyf";
 import "notyf/notyf.min.css";
 
 import AppConfigs from "@/configs/app.configs.json";
-import IconSetting from "virtual:vite-icons/uil/setting";
-import StreamView from "./stream-view.vue";
+import StreamView from "./stream-view/index.vue";
 import ButtonBar from "./button_bar.vue";
 
 export default {
-  components: { IconSetting, StreamView, ButtonBar },
+  components: { StreamView, ButtonBar },
   setup() {
     const notyf = new Notyf({
       duration: 3000,
@@ -48,7 +47,6 @@ export default {
         y: "top",
       },
     });
-    AgoraRTC.setLogLevel(2);
     const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
     var localAudioTrack = ref();
     var localVideoTrack = ref();

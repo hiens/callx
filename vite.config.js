@@ -1,10 +1,9 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import Icons from 'vite-plugin-icons'
 import path from 'path'
 
 export default defineConfig({
-  plugins: [vue(), Icons()],
+  plugins: [vue()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, '/src'),
