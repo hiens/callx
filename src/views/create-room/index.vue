@@ -9,7 +9,7 @@
           Create new room
         </h2>
       </div>
-      <form class="mt-8 space-y-4">
+      <form class="mt-8 space-y-4" v-on:submit.prevent="createRoom">
         <div class="flex">
           <button
             type="button"
@@ -38,8 +38,6 @@
         <div class="flex">
           <input
             v-model="roomName"
-            id="room-name"
-            name="room-name"
             type="text"
             required
             class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
@@ -102,6 +100,34 @@
         </div>
 
         <button
+          v-if="isCreating"
+          disabled
+          class="group relative w-full flex justify-center py-2 px-4 text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none cursor-not-allowed"
+        >
+          <svg
+            class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          Processing
+        </button>
+        <button
+          v-else
           type="button"
           v-on:click="createRoom"
           class="group relative w-full flex justify-center py-2 px-4 text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none"
@@ -109,6 +135,22 @@
           Create room
         </button>
       </form>
+
+      <div
+        v-if="createdLink != null"
+        class="p-4 transition-transform duration-500 ease-in-out rounded-md shadow-xl bg-green-200 relative overflow-hidden"
+      >
+        <p class="text-sm truncate cursor-pointer">
+          Link:
+          <span v-on:click="copyLink" class="font-semibold">{{
+            createdLink
+          }}</span>
+        </p>
+        <p class="text-sm">
+          Password: <span class="font-semibold">{{ roomKey }}</span>
+        </p>
+        <p></p>
+      </div>
     </div>
   </div>
 </template>
@@ -116,53 +158,114 @@
 <script>
 import { ref } from "vue";
 import dayjs from "dayjs";
+import { useRouter } from "vue-router";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import CryptoUtils from "@/utils/crypto-utils";
+import notyf from "@/utils/notyf";
+import createShortLink from "@/utils/short-link";
 
 export default {
   setup() {
+    // Get router
+    var router = useRouter();
+
     // Setup dayjs
     dayjs.extend(localizedFormat);
 
     // State
     var roomName = ref();
+    var roomKey = ref("2312");
     var enableVideo = ref(true);
     var autoClose = ref(false);
     var closeAt = ref(dayjs().add(1, "hour").format("YYYY-MM-DDTHH:mm"));
+    var isCreating = ref(false);
+    var createdLink = ref(null);
 
     // Generate random room name
     function genRoomName() {
       var length = 10;
       var result = [];
       var characters = "abcdefghijklmnopqrstuvwxyz0123456789";
-      var charactersLength = characters.length;
       for (var i = 0; i < length; i++) {
         result.push(
-          characters.charAt(Math.floor(Math.random() * charactersLength))
+          characters.charAt(Math.floor(Math.random() * characters.length))
         );
       }
       roomName.value = result.join("");
     }
 
+    // Generate random room key
+    function genRoomKey() {
+      var length = 4;
+      var result = [];
+      var characters = "0123456789";
+      for (var i = 0; i < length; i++) {
+        result.push(
+          characters.charAt(Math.floor(Math.random() * characters.length))
+        );
+      }
+      roomKey.value = result.join("");
+    }
+
+    // Copy link to clipboard
+    function copyLink() {
+      navigator.clipboard.writeText(createdLink.value).then(
+        function () {
+          notyf.success("Link copied to clipboard");
+        },
+        function (err) {
+          notyf.error(err);
+        }
+      );
+    }
+
     // Generate short link
-    function createRoom() {
+    async function createRoom() {
+      // Check null room name
+      if (!roomName.value) {
+        notyf.error("Enter room name to continue!");
+        return;
+      }
+
+      isCreating.value = true;
+      genRoomKey();
       let data = {
         video: enableVideo.value,
         closeAt: autoClose.value ? closeAt.value : null,
       };
 
-      let token = CryptoUtils.encrypt(JSON.stringify(data), "");
+      let token = CryptoUtils.encrypt(JSON.stringify(data), roomKey.value);
+      let linkPath = router.resolve({
+        name: "room-id",
+        params: { id: roomName.value.replaceAll(" ", "") },
+        query: { token: token },
+      });
+      let longLink = location.origin + linkPath.fullPath;
 
+      try {
+        let response = await createShortLink(longLink);
+        if (response.shortUrl)
+          createdLink.value = "https://" + response.shortUrl;
+        else throw Error(response.message);
+      } catch (e) {
+        notyf.error("Cannot create short link");
+        createdLink.value = longLink;
+      }
+      isCreating.value = false;
     }
 
     // Return
     return {
       roomName,
+      roomKey,
       genRoomName,
       createRoom,
       enableVideo,
       autoClose,
       closeAt,
+      isCreating,
+      createdLink,
+      copyLink,
     };
   },
 };

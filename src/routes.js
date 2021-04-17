@@ -1,9 +1,9 @@
-import RoomId from './views/room/Id.vue'
-import CreateRoom from './views/room/Create.vue'
-import NotFound from './views/NotFound.vue'
+import RoomId from './views/room/index.vue'
+import CreateRoom from './views/create-room/index.vue'
+import NotFound from './views/not-found.vue'
 
 export const routes = [
-  { path: '/room/create', component: CreateRoom },
-  { path: '/room/:id', component: RoomId },
-  { path: '/:path(.*)', component: NotFound },
+  { name: 'create-room', path: '/room/create', component: CreateRoom },
+  { name: 'room-id', path: '/room/:id', component: RoomId },
+  { name: 'not-found', path: '/:path(.*)', component: NotFound },
 ]

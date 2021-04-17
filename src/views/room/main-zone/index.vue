@@ -12,25 +12,16 @@
       </button>
     </div>
 
-    <stream-view
-      :client="client"
-      :local-video="localVideoTrack"
-    />
+    <stream-view />
 
-    <button-bar
-      v-if="client != null"
-      :client="client"
-      :local-audio="localAudioTrack"
-      :local-video="localVideoTrack"
-    />
+    <button-bar v-on:leave="emit('leave')" />
   </div>
 </template>
 
 <script>
-import { computed, ref } from "vue";
 import AgoraRTC from "agora-rtc-sdk-ng";
-import { Notyf } from "notyf";
-import "notyf/notyf.min.css";
+import notyf from "@/utils/notyf";
+import { useStore } from "vuex";
 
 import AppConfigs from "@/configs/app.configs.json";
 import StreamView from "./stream-view/index.vue";
@@ -38,18 +29,14 @@ import ButtonBar from "./button_bar.vue";
 
 export default {
   components: { StreamView, ButtonBar },
-  setup() {
-    const notyf = new Notyf({
-      duration: 3000,
-      dismissible: true,
-      position: {
-        x: "right",
-        y: "top",
-      },
-    });
+  emits: ["leave"],
+  setup(props, { emit }) {
+    // Store
+    const store = useStore();
+
+    // Create client
     const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
-    var localAudioTrack = ref();
-    var localVideoTrack = ref();
+    store.commit("setClient", client);
 
     async function eventHandler() {
       // Subscribe to a remote user
@@ -75,25 +62,22 @@ export default {
       });
       client.on("user-left", (user) => {
         console.log("user-left: " + user.uid);
-        notyf.success(`User ${user.uid} leaved`);
+        notyf.error(`User ${user.uid} leaved`);
       });
     }
 
     async function startVideoCall() {
       // Join channel
       await client.join(AppConfigs.agoraAppId, "demo_channel_name", null);
-
-      // Create and publish local track
-      localAudioTrack.value = await AgoraRTC.createMicrophoneAudioTrack();
-      localVideoTrack.value = await AgoraRTC.createCameraVideoTrack();
-      await client.publish([localAudioTrack.value, localVideoTrack.value]);
+      await client.publish([store.state.videoTrack, store.state.audioTrack]);
     }
 
     // Call function
     eventHandler();
     startVideoCall();
 
-    return { client, localAudioTrack, localVideoTrack };
+    // Return
+    return { emit }
   },
 };
 </script>

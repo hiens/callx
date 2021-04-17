@@ -13,7 +13,7 @@
 
       <div v-else class="w-64">
         <img
-          src="https://www.pngkit.com/png/full/242-2421234_kawaii-cats-render-by-sweetkawaiilove-on-deviantart-anime.png"
+          src="/image/ginger-cat-782.png"
           alt=""
         />
         <h4
@@ -33,7 +33,7 @@
     >
       <div class="flex items-center w-3 h-3 md:w-4 md:h-4 m-auto rounded-full">
         <img
-        class="w-3/4 h-3/4"
+          class="w-3/4 h-3/4"
           :src="
             networkQuality == 0
               ? '/image/loading.gif'
@@ -49,11 +49,11 @@
       class="flex flex-wrap flex-wrap-reverse h-full flex-col absolute top-0 right-2 py-4"
     >
       <div
-        class="w-16 h-16 mb-1 ml-1 bg-black rounded-full border-2 border-white overflow-hidden"
+        class="w-16 h-16 mb-1 ml-1 bg-black rounded-full border-2 border-purple-500 overflow-hidden"
       >
         <video-single
-          v-if="localVideo != null"
           :user="{ uid: client.uid, videoTrack: localVideo }"
+          isLocal
         />
       </div>
       <div
@@ -68,17 +68,17 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import { useStore } from "vuex";
 import VideoSingle from "./video.vue";
 
 export default {
   components: { VideoSingle },
-  props: {
-    client: { type: Object, required: true },
-    localVideo: { type: Object, required: false },
-  },
-  setup(props) {
+  setup() {
     // State
+    const store = useStore();
+    var client = computed(() => store.state.client);
+    var localVideo = computed(() => store.state.videoTrack);
     var mainUser = ref();
     var otherUsers = ref([]);
     var networkQuality = ref(0);
@@ -86,7 +86,7 @@ export default {
     // Check network quality
     function checkNetworkQuality() {
       // Check network quality
-      props.client.on("network-quality", (stats) => {
+      store.state.client.on("network-quality", (stats) => {
         networkQuality.value = stats.downlinkNetworkQuality;
       });
     }
@@ -94,7 +94,7 @@ export default {
     // Update user list everytime event push
     function checkUserList() {
       setInterval(() => {
-        let remoteUsers = props.client.remoteUsers;
+        let remoteUsers = store.state.client.remoteUsers;
         if (remoteUsers.length == 0) {
           // There are no remote users
           mainUser.value = null;
@@ -130,7 +130,14 @@ export default {
     checkNetworkQuality();
 
     // Return
-    return { mainUser, otherUsers, changeMainUser, networkQuality };
+    return {
+      client,
+      localVideo,
+      mainUser,
+      otherUsers,
+      changeMainUser,
+      networkQuality,
+    };
   },
 };
 </script>
