@@ -3,16 +3,15 @@
     <div class="flex bw-full h-16 g-red-500 p-4 md:pt-0 md:px-0">
       <img src="/image/logo.png" height="50" alt="Callx connect logo" />
       <div class="flex-grow"></div>
-      <button
+      <!-- <button
         class="p-0 mx-auto w-10 h-10 md:w-14 md:h-14 rounded-xl hover:bg-red-700 active:shadow-lg mouse shadow transition ease-in duration-200 focus:outline-none bg-gray-500"
       >
         <div class="w-6 md:w-8 m-auto">
-          <!-- <icon-setting style="width: 100%; height: 100%; color: white" /> -->
         </div>
-      </button>
+      </button> -->
     </div>
 
-    <stream-view />
+    <stream-view v-on:leave="emit('leave')" />
 
     <button-bar v-on:leave="emit('leave')" />
   </div>
@@ -22,6 +21,7 @@
 import AgoraRTC from "agora-rtc-sdk-ng";
 import notyf from "@/utils/notyf";
 import { useStore } from "vuex";
+import { useRoute } from "vue-router";
 
 import AppConfigs from "@/configs/app.configs.json";
 import StreamView from "./stream-view/index.vue";
@@ -33,6 +33,8 @@ export default {
   setup(props, { emit }) {
     // Store
     const store = useStore();
+    const route = useRoute();
+    const videoEnabled = store.state.roomData.video;
 
     // Create client
     const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
@@ -68,8 +70,12 @@ export default {
 
     async function startVideoCall() {
       // Join channel
-      await client.join(AppConfigs.agoraAppId, "demo_channel_name", null);
-      await client.publish([store.state.videoTrack, store.state.audioTrack]);
+      await client.join(AppConfigs.agoraAppId, route.params.id, null);
+      await client.publish(
+        videoEnabled
+          ? [store.state.videoTrack, store.state.audioTrack]
+          : [store.state.audioTrack]
+      );
     }
 
     // Call function
@@ -77,7 +83,7 @@ export default {
     startVideoCall();
 
     // Return
-    return { emit }
+    return { emit };
   },
 };
 </script>

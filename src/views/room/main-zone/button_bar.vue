@@ -4,6 +4,7 @@
   >
     <div class="flex flex-col align-center justify-center space-y-1">
       <button
+        v-on:click="switchDevice"
         class="p-0 mx-auto w-12 h-12 md:w-14 md:h-14 bg-white rounded-full hover:bg-gray-100 mouse shadow-2xl transition ease-in duration-200 focus:outline-none"
       >
         <div class="w-6 m-auto">
@@ -23,9 +24,33 @@
         class="p-0 mx-auto w-12 h-12 md:w-14 md:h-14 bg-white rounded-full hover:bg-gray-100 mouse shadow-2xl transition ease-in duration-200 focus:outline-none"
       >
         <div class="w-6 m-auto">
-          <svg width="24" height="24" viewBox="0 0 24 24">
+          <svg v-if="isAudioEnabled" width="24" height="24" viewBox="0 0 36 36">
             <path
-              d="M12 15a4 4 0 0 0 4-4V5a4 4 0 0 0-8 0v6a4 4 0 0 0 4 4zM10 5a2 2 0 0 1 4 0v6a2 2 0 0 1-4 0zm10 6a1 1 0 0 0-2 0a6 6 0 0 1-12 0a1 1 0 0 0-2 0a8 8 0 0 0 7 7.93V21H9a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2h-2v-2.07A8 8 0 0 0 20 11z"
+              d="M18 24c3.9 0 7-3.1 7-7V9c0-3.9-3.1-7-7-7s-7 3.1-7 7v8c0 3.9 3.1 7 7 7zM13 9c0-2.8 2.2-5 5-5s5 2.2 5 5v8c0 2.8-2.2 5-5 5s-5-2.2-5-5V9z"
+              class="clr-i-outline clr-i-outline-path-1"
+              fill="currentColor"
+            ></path>
+            <path
+              d="M30 17h-2c0 5.5-4.5 10-10 10S8 22.5 8 17H6c0 6.3 4.8 11.4 11 11.9V32h-3c-.6 0-1 .4-1 1s.4 1 1 1h8c.6 0 1-.4 1-1s-.4-1-1-1h-3v-3.1c6.2-.5 11-5.6 11-11.9z"
+              class="clr-i-outline clr-i-outline-path-2"
+              fill="currentColor"
+            ></path>
+          </svg>
+
+          <svg v-else width="24" height="24" viewBox="0 0 36 36">
+            <path
+              d="M30 17h-2c0 1.8-.5 3.5-1.4 5l1.5 1.5c1.2-2 1.8-4.2 1.9-6.5z"
+              class="clr-i-outline clr-i-outline-path-1"
+              fill="currentColor"
+            ></path>
+            <path
+              d="M18 4c2.8 0 5 2.2 5 5v8c0 .4-.1.8-.2 1.2l1.6 1.6c.4-.9.6-1.8.6-2.8V9c0-3.9-3.2-7-7.1-6.9c-2.9 0-5.6 1.9-6.5 4.7L13 8.3c.5-2.4 2.6-4.1 5-4.3z"
+              class="clr-i-outline clr-i-outline-path-2"
+              fill="currentColor"
+            ></path>
+            <path
+              d="M25.2 26.6l6.9 6.9l1.4-1.4L4 2.6L2.6 4l8.4 8.4V17c0 3.9 3.1 7 7 7c1.3 0 2.5-.3 3.6-1l2.2 2.2C22.1 26.4 20.1 27 18 27c-5.4.2-9.8-4.1-10-9.4V17H6c.1 6.2 4.8 11.4 11 12v3h-3c-.6 0-1 .4-1 1s.4 1 1 1h8c.6 0 1-.4 1-1s-.4-1-1-1h-3v-3c2.2-.2 4.4-1 6.2-2.4zm-11.4-6.9c-.5-.8-.8-1.7-.8-2.7v-2.6l7.1 7.1c-2.2 1-4.9.3-6.3-1.8z"
+              class="clr-i-outline clr-i-outline-path-3"
               fill="currentColor"
             ></path>
           </svg>
@@ -39,9 +64,20 @@
         class="p-0 mx-auto w-12 h-12 md:w-14 md:h-14 bg-white rounded-full hover:bg-gray-100 mouse shadow-2xl transition ease-in duration-200 focus:outline-none"
       >
         <div class="w-6 m-auto">
-          <svg width="23" height="24" viewBox="0 0 24 24">
+          <svg
+            v-if="isVideoEnabled"
+            width="24"
+            height="24"
+            viewBox="0 0 256 256"
+          >
             <path
-              d="M19 6.5h-1.28l-.32-1a3 3 0 0 0-2.84-2H9.44A3 3 0 0 0 6.6 5.55l-.32 1H5a3 3 0 0 0-3 3v8a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-8a3 3 0 0 0-3-3.05zm1 11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1h2a1 1 0 0 0 1-.68l.54-1.64a1 1 0 0 1 .95-.68h5.12a1 1 0 0 1 .95.68l.54 1.64a1 1 0 0 0 .9.68h2a1 1 0 0 1 1 1zm-8-9a4 4 0 1 0 4 4a4 4 0 0 0-4-4zm0 6a2 2 0 1 1 2-2a2 2 0 0 1-2 2z"
+              d="M208 56h-27.725L166.65 35.562A8 8 0 0 0 159.994 32h-64a8 8 0 0 0-6.656 3.563L75.713 56H48a24.027 24.027 0 0 0-24 24v112a24.027 24.027 0 0 0 24 24h160a24.027 24.027 0 0 0 24-24V80a24.027 24.027 0 0 0-24-24zm8 136a8.01 8.01 0 0 1-8 8H48a8.01 8.01 0 0 1-8-8V80a8.01 8.01 0 0 1 8-8h31.994a8 8 0 0 0 6.656-3.563L100.275 48h55.438l13.625 20.438A8 8 0 0 0 175.994 72H208a8.01 8.01 0 0 1 8 8zM128 88a44 44 0 1 0 44 44a44.05 44.05 0 0 0-44-44zm0 72a28 28 0 1 1 28-28a28.031 28.031 0 0 1-28 28z"
+              fill="currentColor"
+            ></path>
+          </svg>
+          <svg v-else width="24" height="24" viewBox="0 0 256 256">
+            <path
+              d="M39.375 18.619a8 8 0 0 0-11.84 10.762L51.733 56H48a24.027 24.027 0 0 0-24 24v112a24.027 24.027 0 0 0 24 24h149.188l19.438 21.381a8 8 0 0 0 11.84-10.762zm66.202 96.609l36.995 40.695a28.007 28.007 0 0 1-36.995-40.695zM48 200a8.01 8.01 0 0 1-8-8V80a8.01 8.01 0 0 1 8-8h18.279l28.414 31.256A43.994 43.994 0 0 0 128 176a44.196 44.196 0 0 0 25.441-8.121L182.643 200zM232 80v106.029a8 8 0 1 1-16 0V80a8.01 8.01 0 0 0-8-8h-32.006a8 8 0 0 1-6.657-3.563L155.712 48h-55.47a8 8 0 0 1-12.913-9.423l2.007-3.014A8 8 0 0 1 95.994 32h64a8 8 0 0 1 6.656 3.563L180.275 56H208a24.027 24.027 0 0 1 24 24z"
               fill="currentColor"
             ></path>
           </svg>
@@ -71,11 +107,11 @@
 <script>
 import { computed, ref } from "vue";
 import { useStore } from "vuex";
-import AgoraRTC from "agora-rtc-sdk-ng";
+import notyf from "@/utils/notyf";
 
 export default {
-  emits: ['leave'],
-  setup(props, {emit}) {
+  emits: ["leave"],
+  setup(props, { emit }) {
     // States
     const store = useStore();
     var localAudio = computed(() => store.state.audioTrack);
@@ -96,6 +132,11 @@ export default {
       localVideo.value.setEnabled(isVideoEnabled.value);
     }
 
+    // Switch device
+    function switchDevice() {
+      notyf.error("Not implement yet!");
+    }
+
     // End call
     async function endCall() {
       // Destroy the local audio and video tracks.
@@ -104,7 +145,7 @@ export default {
 
       // Leave the channel.
       await client.value.leave();
-      emit('leave')
+      emit("leave");
     }
 
     // Return
@@ -114,6 +155,7 @@ export default {
       toggleAudio,
       toggleVideo,
       endCall,
+      switchDevice,
     };
   },
 };

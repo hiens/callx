@@ -30,12 +30,14 @@
 import { ref } from "vue";
 import CryptoUtils from "@/utils/crypto-utils";
 import { useRoute } from "vue-router";
+import { useStore } from "vuex";
 import notyf from "@/utils/notyf";
 
 export default {
-  emits: ["done"],
   setup(props, { emit }) {
     // State
+    const store = useStore();
+
     var route = useRoute();
     var isValid = ref(route.query.token ? true : false);
     var password = ref();
@@ -48,7 +50,8 @@ export default {
           password.value
         );
         const decryptedJson = JSON.parse(decryptedData);
-        if (decryptedJson && decryptedJson.video) {
+        if (decryptedJson && decryptedJson.video != null) {
+          store.commit('setRoomData', decryptedJson)
           emit("done");
         }
       } catch (e) {

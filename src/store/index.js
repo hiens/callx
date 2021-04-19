@@ -4,7 +4,8 @@ export default {
       client: null,
       videoTrack: null,
       audioTrack: null,
-      remoteUsers: {}
+      remoteUsers: [],
+      roomData: null,
     }
   },
   mutations: {
@@ -14,6 +15,9 @@ export default {
     setTracks(state, payload) {
       state.audioTrack = payload.audioTrack
       state.videoTrack = payload.videoTrack
+    },
+    setRoomData(state, data) {
+      state.roomData = data
     }
   }
 }
