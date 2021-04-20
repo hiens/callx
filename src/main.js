@@ -1,13 +1,13 @@
 import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { createStore } from 'vuex'
-import App from './app.vue'
-import { routes } from './routes.js'
-import store from "./store/index"
+import App from '@/app.vue'
+import { routes } from '@/routes.js'
+import store from "@/store/index"
 
 import "notyf/notyf.min.css";
-import './tailwind.css'
-import './styles.css'
+import '@/tailwind.css'
+import '@/styles.css'
 
 const app = createApp(App)
 
