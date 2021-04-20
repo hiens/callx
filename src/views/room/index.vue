@@ -5,7 +5,7 @@
     <div v-if="stateIndex == 0" class="w-96 mx-6 p-4 bg-white shadow-xl rounded-lg">
       <device-setup v-on:done="stateIndex++" />
     </div>
-    <div v-else-if="stateIndex == 1" class="flex h-full 2xl:h-5/6 max-w-screen-2xl md:p-6 m-auto">
+    <div v-else-if="stateIndex == 1" class="flex h-full 2xl:h-5/6 w-full max-w-screen-2xl md:p-6 m-auto">
       <main-zone v-on:leave="stateIndex++" />
       <chat-zone />
     </div>

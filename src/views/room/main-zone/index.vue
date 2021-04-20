@@ -1,14 +1,8 @@
 <template>
-  <div class="flex-grow h-full flex h-full flex-col">
-    <div class="flex bw-full h-16 g-red-500 p-4 md:pt-0 md:px-0">
-      <img src="/image/logo.png" height="50" alt="Callx connect logo" />
+  <div class="flex-grow w-full flex h-full flex-col">
+    <div class="flex w-full h-16 g-red-500 p-4 md:pt-0 md:px-0">
+      <img src="/image/logo.png" height="50" width="150" alt="Callx connect logo" />
       <div class="flex-grow"></div>
-      <!-- <button
-        class="p-0 mx-auto w-10 h-10 md:w-14 md:h-14 rounded-xl hover:bg-red-700 active:shadow-lg mouse shadow transition ease-in duration-200 focus:outline-none bg-gray-500"
-      >
-        <div class="w-6 md:w-8 m-auto">
-        </div>
-      </button> -->
     </div>
 
     <stream-view v-on:leave="emit('leave')" />
